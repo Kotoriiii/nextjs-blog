@@ -63,7 +63,7 @@ const Login = (props: IProps) => {
 
   const handleOAuthGithub = () => {
     const githubClientId = process.env.NEXT_PUBLIC_githubClientId;
-    const redirectUri = 'https://nextjs-blog-nee3w9i79-kotoriiiis-projects.vercel.app/api/oauth/redirect';
+    const redirectUri = 'https://nextjs-blog-nee3w9i79-kotoriiiis-projects.vercel.app/oauth/redirect';
     window.open(
       `https://github.com/login/oauth/authorize?client_id=${githubClientId}&redirect_uri=${redirectUri}`,
       '_self'
