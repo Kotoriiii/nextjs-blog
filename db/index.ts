@@ -1,31 +1,31 @@
 import 'reflect-metadata';
-import { Connection, getConnection, createConnection } from 'typeorm';
+import { DataSource } from 'typeorm';
 import { User, UserAuth, Article, Comment, Tag } from './entity/index'
+//let connectionReadyPromise: Promise<DataSource> | null = null;
 
-let connectionReadyPromise: Promise<Connection> | null = null;
+const AppDataSource = new DataSource({
+  type: 'mysql',
+  host: process.env.SQL_HOST,
+  port: (process.env.SQL_PORT as unknown) as number,
+  username: process.env.SQL_USER as string,
+  password: process.env.SQL_PASSWORD as string,
+  database: process.env.SQL_DATABASE as string,
+  entities: [User, UserAuth, Article, Comment, Tag],
+  synchronize: false,
+  logging: true,
+})
 
 export const prepareConnenction = () => { 
-    connectionReadyPromise = (async () => {
+    const connectionReadyPromise = (async () => {
       try {
-        const staleConnection = getConnection();
-        await staleConnection.close();
-      } catch (err) {
-        console.log(err);
+        if(!AppDataSource.isInitialized){
+          await AppDataSource.initialize();
+        }
+      } catch (error) {
+        console.error("Error during Data Source initialization:", error);
       }
 
-      const connenction = await createConnection({
-        type: 'mysql',
-        host: process.env.SQL_HOST,
-        port: (process.env.SQL_PORT as unknown) as number,
-        username: process.env.SQL_USER as string,
-        password: process.env.SQL_PASSWORD as string,
-        database: process.env.SQL_DATABASE as string,
-        entities: [User, UserAuth, Article, Comment, Tag],
-        synchronize: false,
-        logging: true,
-      });
-
-      return connenction;
+      return AppDataSource
     })();
   
 
