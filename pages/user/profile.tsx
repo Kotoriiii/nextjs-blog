@@ -1,9 +1,20 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import { Form, Input, Button, message } from 'antd';
-import request from 'service/fetch';
 import styles from './index.module.scss';
 import { useRouter } from 'next/router';
+import { useGetData, usePostData } from 'hooks/useRequest';
+
+interface Info {
+  id: number
+  nickname: string;
+  job: string;
+  introduce: string;
+}
+
+interface IUser {
+  userInfo: Info;
+}
 
 const layout = {
   labelCol: { span: 5 },
@@ -19,24 +30,26 @@ const UserProfile = () => {
   const { push } = useRouter();
   const [id, setId] = useState(0);
 
-  useEffect(() => {
-    request.get('/api/user/detail').then((res: any) => {
-      if (res?.code === 0) {
-        form.setFieldsValue(res?.data?.userInfo);
-        setId(Number(res?.data?.userInfo?.id));
-      }
-    });
-  }, [form]);
+  const { data } = useGetData<IUser>({ url: '/api/user/detail' });
+  form.setFieldsValue(data?.userInfo);
+  setId(Number(data?.userInfo?.id));
 
-  const handleSubmit = (values: any) => {
-    request.post('/api/user/update', { ...values }).then((res: any) => {
+  const { trigger } =usePostData({
+    url:'/api/user/update',
+    method:"POST"
+  },{
+    onSuccess(res){
       if (res?.code === 0) {
         message.success('修改成功');
         push(`/user/${id}`);
-      } else {
-        message.error(res?.msg || '修改失败');
-      }
-    });
+      } 
+    }
+  })
+
+  const handleSubmit = (values: any) => {
+    trigger({
+      ...values
+    })
   };
 
   return (

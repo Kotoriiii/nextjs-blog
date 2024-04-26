@@ -11,7 +11,7 @@ export default withIronSessionApiRoute(update, ironOptions);
 async function update(req: NextApiRequest, res: NextApiResponse) {
   const session: ISession = req.session;
   const { userId } = session;
-  const { nickname = '', job = '', introduce = '' } = req.body;
+  const { nickname, job, introduce } = req.body;
   const db = await prepareConnenction();
   const userRepo = db.getRepository(User);
 

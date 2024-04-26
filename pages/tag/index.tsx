@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Tabs, Button, message } from 'antd';
 import { useStore } from 'store';
 import { observer } from 'mobx-react-lite';
-import request from 'service/fetch';
 import styles from './index.module.scss';
 import * as ANTD_ICONS from '@ant-design/icons';
+import { useGetData, usePostData } from 'hooks/useRequest';
+import Loading from 'component/loading';
 
 const { TabPane } = Tabs;
 
@@ -23,60 +24,61 @@ interface ITag {
   users: IUser[];
 }
 
+interface IData {
+  followTags: ITag[];
+  allTags: ITag[];
+}
+
 const Tag = () => {
   const store = useStore();
-  const [followTags, setFollowTags] = useState<ITag[]>();
-  const [allTags, setAllTags] = useState<ITag[]>();
   const [needRefresh, setNeedRefresh] = useState(false);
   const { userId } = store?.user?.userInfo|| {};
 
-  useEffect(() => {
-    request.get('/api/tag/get').then((res: any) => {
-      if (res?.code === 0) {
-        const { followTags = [], allTags = [] } = res?.data || {};  
-        setFollowTags(followTags);
-        setAllTags(allTags);
-      }
-    });
-  }, [needRefresh]);
-
-  
-
-  const handleUnFollow = (tagId:any) =>{
-    request.post('/api/tag/follow',{
-      type: 'unfollow',
-      tagId
-    }).then((res: any) => {
-      if (res?.code === 0) {
-        message.success('取关成功');
-        setNeedRefresh(!needRefresh);
-      }
-      else{
-        message.error(res?.msg || '取关失败');
-      }
-    });
-  }
-
-  const handleFollow = (tagId:number) =>{
-    request.post('/api/tag/follow',{
-      type: 'follow',
-      tagId
-    }).then((res: any) => {
+  const { trigger: followTag } = usePostData({
+    url: '/api/tag/follow',
+    method: 'POST'
+  },{
+    onSuccess(res){
       if (res?.code === 0) {
         message.success('关注成功');
         setNeedRefresh(!needRefresh);
       }
-      else{
-        message.error(res?.msg || '关注失败');
+    }
+  });
+  const { trigger: UnfollowTag } = usePostData({
+    url: '/api/tag/follow',
+    method: 'POST'
+  },{
+    onSuccess(res){
+      if (res?.code === 0) {
+        message.success('取关成功');
+        setNeedRefresh(!needRefresh);
       }
+    }
+  });
+
+  const { data, isLoading } = useGetData<IData>({ url:'/api/tag/get' });
+  if (isLoading) return <Loading/>;
+
+  const handleUnFollow = (tagId:any) =>{
+    UnfollowTag({
+      type: 'unfollow',
+      tagId
     });
+  }
+
+  const handleFollow = (tagId:number) =>{
+    followTag({
+      type: 'follow',
+      tagId
+    })
   }
 
   return (
     <div className="content-layout">
       <Tabs defaultActiveKey="all">
         <TabPane tab="已关注标签" key="follow" className={styles.tags}>
-          {followTags?.map((tag) => (
+          {data?.followTags?.map((tag) => (
             <div key={tag?.title} className={styles.tagWrapper}>
               <div>{(ANTD_ICONS as any)[tag?.icon]?.render()}</div>
               <div className={styles.title}>{tag?.title}</div>
@@ -94,7 +96,7 @@ const Tag = () => {
           ))}
         </TabPane>
         <TabPane tab="全部标签" key="all" className={styles.tags}>
-        {allTags?.map((tag) => (
+        {data?.allTags?.map((tag) => (
             <div key={tag?.title} className={styles.tagWrapper}>
               <div>{(ANTD_ICONS as any)[tag?.icon]?.render()}</div>
               <div className={styles.title}>{tag?.title}</div>

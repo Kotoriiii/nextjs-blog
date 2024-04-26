@@ -36,7 +36,6 @@ async function follow(req: NextApiRequest, res: NextApiResponse) {
     return;
   }
 
-
   if (tag?.users) {
     if (type === 'follow') {
       tag.users = tag?.users?.concat([user]);

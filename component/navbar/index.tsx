@@ -8,7 +8,7 @@ import { Button, Avatar, Dropdown, Menu, message } from 'antd';
 import { LoginOutlined, HomeOutlined } from '@ant-design/icons';
 import Login from 'component/login';
 import { useStore } from 'store';
-import request from 'service/fetch';
+import { usePostData } from 'hooks/useRequest';
 import { observer } from 'mobx-react-lite';
 
 const Navbar: NextPage = () => {
@@ -16,6 +16,14 @@ const Navbar: NextPage = () => {
   const { userId, avatar } = store.user.userInfo;
   const { pathname, push } = useRouter();
   const [isShowLogin, setIsShowLogin] = useState(false);
+  const { trigger } = usePostData({ url: '/api/user/logout', method: 'Post' }, {
+    onSuccess(data){
+      console.log(data)
+      if(data.code === 0){
+        store.user.setUserInfo({});
+      }
+    }
+  });
 
   const handleGoToEditorPage = () => {
     if (userId) {
@@ -38,11 +46,12 @@ const Navbar: NextPage = () => {
   };
 
   const handleLogout = () => {
-    request.post('/api/user/logout').then((res: any) => {
-      if (res?.code === 0) {
-        store.user.setUserInfo({});
-      }
-    });
+    // request.post('/api/user/logout').then((res: any) => {
+    //   if (res?.code === 0) {
+    //     store.user.setUserInfo({});
+    //   }
+    // });
+    trigger();
   };
 
   const renderDropDownMenu = () => {

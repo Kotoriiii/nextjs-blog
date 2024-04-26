@@ -32,9 +32,15 @@
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "reflect-metadata": "^0.1.13",
+    "swr": "^2.2.5",
     "typeorm": "^0.3.16"
   },
   "devDependencies": {
+    "@alicloud/dysmsapi20170525": "2.0.24",
+    "@alicloud/openapi-client": "^0.4.8",
+    "@alicloud/tea-console": "^1.0.0",
+    "@alicloud/tea-typescript": "^1.7.1",
+    "@alicloud/tea-util": "^1.4.7",
     "@babel/core": "^7.22.1",
     "@babel/plugin-proposal-class-properties": "^7.18.6",
     "@babel/plugin-proposal-decorators": "^7.22.3",

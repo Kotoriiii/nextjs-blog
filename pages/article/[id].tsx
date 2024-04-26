@@ -9,7 +9,7 @@ import { observer } from 'mobx-react-lite';
 import { useStore } from 'store';
 import Link from 'next/link';
 import MarkDown from 'markdown-to-jsx';
-import request from 'service/fetch';
+import { usePostData } from 'hooks/useRequest';
 
 interface Iprops {
   article: IArticle;
@@ -50,33 +50,33 @@ const ArticleViews = (props: Iprops) => {
   const [inputVal, setInputVal] = useState('');
   const [comments, setComments] = useState(article?.comments || []);
 
-  const handleComment = () => {
-    request
-      .post('api/comment/publish', {
-        articleId: article?.id,
-        content: inputVal,
-      })
-      .then((res: any) => {
-        if (res?.code === 0) {
-          message.success('发表成功');
-          const newComments = [
-            {
-              id: Math.random(),
-              create_time: new Date(),
-              update_time: new Date(),
-              content: inputVal,
-              user: {
-                avatar: loginUserInfo?.avatar,
-                nickname: loginUserInfo?.nickname,
-              },
+  const {trigger} = usePostData({'url':'api/comment/publish',method: 'POST'},{
+    onSuccess(res){
+      if (res?.code === 0) {
+        message.success('发表成功');
+        const newComments = [
+          {
+            id: Math.random(),
+            create_time: new Date(),
+            update_time: new Date(),
+            content: inputVal,
+            user: {
+              avatar: loginUserInfo?.avatar,
+              nickname: loginUserInfo?.nickname,
             },
-          ].concat([...(comments as any)]);
-          setComments(newComments);
-          setInputVal('');
-        } else {
-          message.error('发表失败');
-        }
-      });
+          },
+        ].concat([...(comments as any)]);
+        setComments(newComments);
+        setInputVal('');
+      }
+    }
+  })
+
+  const handleComment = () => {
+    trigger({
+      articleId: article?.id,
+      content: inputVal
+    })
   };
 
   return (

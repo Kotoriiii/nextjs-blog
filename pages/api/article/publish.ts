@@ -23,8 +23,8 @@ async function publish(req: NextApiRequest, res: NextApiResponse) {
   });
 
   const tags = await tagRepo.find({
-    where: tagIds?.map((tagId:number) => ({id:tagId}))
-  })
+    where: tagIds?.map((tagId: number) => ({ id: tagId })),
+  });
 
   const article = new Article();
   article.title = title;
@@ -38,22 +38,20 @@ async function publish(req: NextApiRequest, res: NextApiResponse) {
     article.user = user;
   }
 
-  if(tags) {
-    const newTags = tags?.map(tag=>{
-      tag.article_count = tag?.article_count+1;
+  if (tags) {
+    const newTags = tags?.map((tag) => {
+      tag.article_count = tag?.article_count + 1;
       return tag;
-    })
+    });
 
     article.tags = newTags;
   }
 
   const resArticle = await articleRepo.save(article);
 
-  if(resArticle){
+  if (resArticle) {
     res.status(200).json({ data: resArticle, code: 0, msg: '发布成功' });
+  } else {
+    res.status(404).json({ ...EXCEPTION_ARTICLE.PUBLISH_FAILED });
   }
-  else{
-    res.status(404).json({...EXCEPTION_ARTICLE.PUBLISH_FAILED})
-  }
-
 }
