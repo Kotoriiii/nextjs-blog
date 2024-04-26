@@ -1,8 +1,8 @@
 import { ChangeEvent, useState } from 'react';
 import styles from './index.module.scss';
-import CountDown from 'component/countdown';
+import useCountDown from 'hooks/useCountDown';
 import { message } from 'antd';
-import request from 'service/fetch';
+import { usePostData } from 'hooks/useRequest';
 import { useStore } from 'store/index';
 import { observer } from 'mobx-react-lite';
 
@@ -20,6 +20,38 @@ const Login = (props: IProps) => {
   });
 
   const [isShowVerifyCode, setIsShowVerifyCode] = useState(false);
+  const count = useCountDown(10, isShowVerifyCode, () =>
+    setIsShowVerifyCode(false)
+  );
+
+  const { trigger: sendVerifyCode } = usePostData(
+    {
+      url: '/api/user/sendVerifyCode',
+      method: 'POST',
+    },
+    {
+      onSuccess(res) {
+        if (res?.code === 0) {
+          setIsShowVerifyCode(true);
+        }
+      },
+    }
+  );
+
+  const { trigger: login } = usePostData(
+    {
+      url: '/api/user/login',
+      method: 'POST',
+    },
+    {
+      onSuccess(res) {
+        if (res?.code === 0) {
+          store.user.setUserInfo(res?.data);
+          onClose && onClose();
+        }
+      },
+    }
+  );
 
   const handleClose = () => {
     onClose && onClose();
@@ -30,35 +62,24 @@ const Login = (props: IProps) => {
       message.warning('请输入手机号');
       return;
     }
-    request
-      .post('/api/user/sendVerifyCode', {
-        to: form?.phone,
-        templateId: 1,
-      })
-      .then((res: any) => {
-        if (res?.code === 0) {
-          setIsShowVerifyCode(true);
-        } else {
-          message.warning(res?.msg || '未知错误');
-        }
-      });
+    sendVerifyCode({
+      phone: form.phone,
+    });
   };
 
   const handleLogin = () => {
-    request
-      .post('/api/user/login', {
-        ...form,
-        identity_type: 'phone',
-      })
-      .then((res: any) => {
-        if (res?.code === 0) {
-          store.user.setUserInfo(res?.data);
-          console.log(store);
-          onClose && onClose();
-        } else {
-          message.error(res?.msg || '未知错误');
-        }
-      });
+    if (!form?.phone) {
+      message.warning('请输入手机号');
+      return;
+    }
+    if (!form?.verify) {
+      message.warning('请输入验证号');
+      return;
+    }
+    login({
+      ...form,
+      identity_type: 'phone',
+    });
   };
 
   const handleOAuthGithub = () => {
@@ -73,10 +94,6 @@ const Login = (props: IProps) => {
   const handleFormChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setForm({ ...form, [name]: value });
-  };
-
-  const handleCountDownEnd = () => {
-    setIsShowVerifyCode(false);
   };
 
   return isShow ? (
@@ -105,7 +122,7 @@ const Login = (props: IProps) => {
           ></input>
           <span className={styles.verifyCode} onClick={handleGetVerifyCode}>
             {isShowVerifyCode ? (
-              <CountDown time={10} onEnd={handleCountDownEnd} />
+              <div className={styles.countDown}>{count}</div>
             ) : (
               '获取验证码'
             )}

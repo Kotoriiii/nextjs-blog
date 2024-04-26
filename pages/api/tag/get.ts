@@ -8,30 +8,30 @@ import { Tag } from 'db/entity';
 export default withIronSessionApiRoute(get, ironOptions);
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
-  const session:ISession = req.session;
-  const { userId = 0 } = session ;
+  const session: ISession = req.session;
+  const { userId = 0 } = session;
   const db = await prepareConnenction();
   const tagRepo = db.getRepository(Tag);
 
   const followTags = await tagRepo.find({
-    relations: ['users'], 
+    relations: ['users'],
     where: {
-        users:{
-            id : Number(userId)
-        }
-    }
+      users: {
+        id: Number(userId),
+      },
+    },
   });
 
   const allTags = await tagRepo.find({
-    relations: ['users'], 
+    relations: ['users'],
   });
 
   res?.status(200).json({
     code: 0,
-    msg:'',
-    data:{
-        followTags,
-        allTags,
-    }
-  })
+    msg: '',
+    data: {
+      followTags,
+      allTags,
+    },
+  });
 }

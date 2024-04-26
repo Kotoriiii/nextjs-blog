@@ -11,31 +11,29 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   const db = await prepareConnenction();
   const articleRepo = db.getRepository(Article);
 
-  console.log(111)
+  console.log(111);
   console.log(tagid);
 
   let articles = [];
 
-  if(tagid){
+  if (tagid) {
     articles = await articleRepo.find({
-        relations: ['user','tags'],
-        where: {
-            tags:{
-                id: Number(tagid),
-            }
-        }
-    })
-  }
-  else {
+      relations: ['user', 'tags'],
+      where: {
+        tags: {
+          id: Number(tagid),
+        },
+      },
+    });
+  } else {
     articles = await articleRepo.find({
-        relations: ['user','tags'],
-    })
+      relations: ['user', 'tags'],
+    });
   }
 
   res?.status(200).json({
     code: 0,
-    msg:"",
+    msg: '',
     data: articles || [],
-  })
-
+  });
 }

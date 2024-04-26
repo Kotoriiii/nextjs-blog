@@ -7,7 +7,7 @@ import { IArticle } from './api';
 import { Itag } from './api';
 import classnames from 'classnames';
 import styles from './index.module.scss';
-import request from 'service/fetch';
+import request from 'hooks/useRequest/AxiosInstance';
 
 interface IProps {
   articles: IArticle[];
@@ -40,26 +40,24 @@ const Home = (props: IProps) => {
 
   const handleSelectTag = (e: any) => {
     const { tagid, active } = e?.target?.dataset || {};
-    
-    if(active === 'active') {
+
+    if (active === 'active') {
       setSelectTag(0);
       setActive('');
-    }
-    else{
+    } else {
       setSelectTag(Number(tagid));
       setActive('active');
     }
   };
 
   useEffect(() => {
-    if(selectTag){
+    if (selectTag) {
       request.get(`/api/article/get?tagid=${selectTag}`).then((res: any) => {
         if (res?.code === 0) {
           setShowAricles(res?.data);
         }
       });
-    }
-    else{
+    } else {
       request.get(`/api/article/get`).then((res: any) => {
         if (res?.code === 0) {
           setShowAricles(res?.data);

@@ -15,6 +15,5 @@ async function logout(req: NextApiRequest, res: NextApiResponse) {
 
   clearCookie(cookie);
 
-
-  res.status(200).json({code:0, msg: '退出成功', data: {}})
+  res.status(200).json({ code: 0, msg: '退出成功', data: {} });
 }

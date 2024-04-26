@@ -10,13 +10,20 @@ import { setCookie } from 'util/index';
 export default withIronSessionApiRoute(login, ironOptions);
 
 async function login(req: NextApiRequest, res: NextApiResponse) {
-  const { phone = '', verify = '', identity_type = 'phone' } = req.body;
+  const { phone, verify, identity_type } = req.body;
   const db = await prepareConnenction();
   const userAuthRepo = db.getRepository(UserAuth);
   const session: ISession = req.session;
   const cookie = Cookie.fromApiRoute(req, res);
+  const diffSecond = (Date.now() - Number(session.startTime)) / 1000;
 
-  console.log(session.verifyCode);
+  if (diffSecond > 60) {
+    res?.status(400).json({
+      code: -1,
+      msg: '验证码已经过期',
+    });
+    return;
+  }
 
   if (String(session.verifyCode) === String(verify)) {
     const auth = await userAuthRepo.findOne({
@@ -79,6 +86,6 @@ async function login(req: NextApiRequest, res: NextApiResponse) {
       });
     }
   } else {
-    res?.status(200).json({ code: -1, msg: '验证码错误' });
+    res?.status(400).json({ code: -1, msg: '验证码错误' });
   }
 }

@@ -2,11 +2,17 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { withIronSessionApiRoute } from 'iron-session/next';
 import { ironOptions } from 'config';
 import { ISession } from '..';
-import request from 'service/fetch';
+import request from 'hooks/useRequest/AxiosInstance';
 import { Cookie } from 'next-cookie'
 import { prepareConnenction } from 'db';
 import { UserAuth,User } from 'db/entity';
 import { setCookie } from 'util/index';
+
+// interface GitHubTokenResponse {
+//   access_token: string;
+//   token_type: string;
+//   scope: string;
+// }
 
 export default withIronSessionApiRoute(redirect, ironOptions);
 
@@ -29,16 +35,12 @@ async function redirect(req: NextApiRequest, res: NextApiResponse) {
 
   const { access_token } = result as any;
 
-  console.log(access_token);
-
   const githubUserInfo = await request.get('https://api.github.com/user', {
     headers:{
         Accept: 'application/json',
         Authorization: `token ${access_token}`
     }
   })
-
-  console.log(githubUserInfo)
 
   const { id:github_id, login='', avatar_url='' } = githubUserInfo as any;
 

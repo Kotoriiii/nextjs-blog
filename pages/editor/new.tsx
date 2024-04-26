@@ -4,7 +4,7 @@ import dynamic from 'next/dynamic';
 import { ChangeEvent, useEffect, useState } from 'react';
 import { Input, Button, message, Select } from 'antd';
 import styles from './index.module.scss';
-import request from 'service/fetch';
+import request from 'hooks/useRequest/AxiosInstance';
 import { observer } from 'mobx-react-lite';
 import { useStore } from 'store';
 import { useRouter } from 'next/router';

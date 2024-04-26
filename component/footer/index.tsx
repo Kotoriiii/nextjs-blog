@@ -1,5 +1,5 @@
 import type { NextPage } from 'next';
-import styles from './index.module.scss'
+import styles from './index.module.scss';
 
 const Footer: NextPage = () => {
   return (

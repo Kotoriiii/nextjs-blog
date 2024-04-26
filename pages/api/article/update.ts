@@ -17,20 +17,19 @@ async function update(req: NextApiRequest, res: NextApiResponse) {
     where: {
       id: id,
     },
-    relations: ['user','tags'],
+    relations: ['user', 'tags'],
   });
 
   const tags = await tagRepo.find({
     where: tagIds?.map((tagId: number) => ({ id: tagId })),
   });
 
-  const newTags = tags?.map(tag => {
-    if(tag.article_count !== 1){
-        tag.article_count = tag.article_count + 1;
+  const newTags = tags?.map((tag) => {
+    if (tag.article_count !== 1) {
+      tag.article_count = tag.article_count + 1;
     }
     return tag;
   });
-
 
   if (article) {
     article.title = title;
