@@ -10,6 +10,7 @@ import { useRouter } from 'next/router';
 import { prepareConnenction } from 'db';
 import { Article } from 'db/entity';
 import { IArticle } from 'pages/api';
+import useTitle from 'hooks/useTitle';
 
 const MDEditor = dynamic(() => import('@uiw/react-md-editor'), { ssr: false });
 
@@ -48,7 +49,7 @@ const ModifyEditor = ({article} : IProps) => {
   const [allTags, setAllTags] = useState([]);
   const [tagIds, setTagIds] = useState((article?.tags?.map(tag => tag.id)) || []);
 
-  console.log(tagIds)
+  useTitle('编辑文章');
 
   const { push, query } = useRouter();
   const articleId = Number(query?.id);
@@ -93,7 +94,6 @@ const ModifyEditor = ({article} : IProps) => {
   }
 
   const handleSelectTag = (value:any) => {
-    console.log(value)
     setTagIds(value);
   }
 

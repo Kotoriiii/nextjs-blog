@@ -7,4 +7,8 @@ export const navs = [
     label: '标签',
     value: '/tag',
   },
+  {
+    label: '问题',
+    value: '/questions'
+  }
 ];

@@ -8,6 +8,7 @@ import request from 'hooks/useRequest/AxiosInstance';
 import { observer } from 'mobx-react-lite';
 import { useStore } from 'store';
 import { useRouter } from 'next/router';
+import useTitle from 'hooks/useTitle';
 
 const MDEditor = dynamic(() => import('@uiw/react-md-editor'), { ssr: false });
 
@@ -21,6 +22,8 @@ const NewEditor = () => {
   const { push } = useRouter();
   const [allTags, setAllTags] = useState([]);
   const [tagIds, setTagIds] = useState([]);
+
+  useTitle('编辑文章');
 
   useEffect(()=>{
     request.get('/api/tag/get').then((res:any) => {

@@ -1,7 +1,10 @@
 import '../styles/globals.css';
-import Layout from '../component/layout';
+import Layout from 'component/layout';
 import { StoreProvider } from 'store';
 import { NextPage } from 'next';
+import ErrorBoundary from 'component/errorboundary';
+import { AppContext } from 'next/app';
+import { IncomingMessage } from 'http';
 
 interface IProps {
   initialValue: Record<any, any>;
@@ -9,27 +12,36 @@ interface IProps {
   pageProps: any;
 }
 
-function MyApp({ initialValue, Component, pageProps }: IProps) {
+interface IRequest extends IncomingMessage{
+  cookies: Record<string, string>;
+}
+
+function MyApp({initialValue, Component, pageProps }: IProps) {
+
   const renderLayout = () => {
     if ((Component as any).layout === null) {
       return <Component {...pageProps} />;
     } else {
       return (
         <Layout>
-          <Component {...pageProps} />
+          <ErrorBoundary>
+            <Component {...pageProps} />
+          </ErrorBoundary>
         </Layout>
       );
     }
   };
 
   return (
-    <StoreProvider initialValue={initialValue}>{renderLayout()}</StoreProvider>
+    <StoreProvider initialValue={ initialValue }>
+      {renderLayout()}
+    </StoreProvider>
   );
 }
 
-MyApp.getInitialProps = async ({ ctx }: any) => {
-  const { userId, nickname, avatar } = ctx?.req?.cookies || {};
-
+MyApp.getInitialProps = async ({ ctx }: AppContext) => {
+  const { userId, nickname, avatar } = (ctx?.req as IRequest).cookies || {};
+  console.log((ctx?.req as IRequest).cookies)
   return {
     initialValue: {
       user: {

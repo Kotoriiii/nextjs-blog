@@ -10,6 +10,7 @@ import { useStore } from 'store';
 import Link from 'next/link';
 import MarkDown from 'markdown-to-jsx';
 import { usePostData } from 'hooks/useRequest';
+import useTitle from 'hooks/useTitle';
 
 interface Iprops {
   article: IArticle;
@@ -49,6 +50,8 @@ const ArticleViews = (props: Iprops) => {
 
   const [inputVal, setInputVal] = useState('');
   const [comments, setComments] = useState(article?.comments || []);
+
+  useTitle(`${article.title}-BlogC`)
 
   const {trigger} = usePostData({'url':'api/comment/publish',method: 'POST'},{
     onSuccess(res){

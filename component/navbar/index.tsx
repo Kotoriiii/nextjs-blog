@@ -18,7 +18,6 @@ const Navbar: NextPage = () => {
   const [isShowLogin, setIsShowLogin] = useState(false);
   const { trigger } = usePostData({ url: '/api/user/logout', method: 'Post' }, {
     onSuccess(data){
-      console.log(data)
       if(data.code === 0){
         store.user.setUserInfo({});
       }
@@ -46,11 +45,6 @@ const Navbar: NextPage = () => {
   };
 
   const handleLogout = () => {
-    // request.post('/api/user/logout').then((res: any) => {
-    //   if (res?.code === 0) {
-    //     store.user.setUserInfo({});
-    //   }
-    // });
     trigger();
   };
 
@@ -82,15 +76,15 @@ const Navbar: NextPage = () => {
         ))}
       </section>
       <section className={styles.operationArea}>
-        <Button onClick={handleGoToEditorPage}>写文章</Button>
+        <Button onClick={handleGoToEditorPage} className={styles.operationButton}>写文章</Button>
         {userId ? (
           <>
-            <Dropdown overlay={renderDropDownMenu()} placement="bottomLeft">
-              <Avatar src={avatar} size={32}></Avatar>
+            <Dropdown overlay={renderDropDownMenu()} placement="bottom" className={styles.operationButton}>
+              <Avatar src={avatar} size={32} ></Avatar>
             </Dropdown>
           </>
         ) : (
-          <Button type="primary" onClick={handleLogin}>
+          <Button type="primary" onClick={handleLogin} className={styles.operationButton}>
             登陆
           </Button>
         )}

@@ -11,9 +11,6 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   const db = await prepareConnenction();
   const articleRepo = db.getRepository(Article);
 
-  console.log(111);
-  console.log(tagid);
-
   let articles = [];
 
   if (tagid) {
