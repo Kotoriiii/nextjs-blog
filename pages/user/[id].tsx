@@ -9,8 +9,11 @@ import {
   FireOutlined,
   FundViewOutlined,
 } from '@ant-design/icons';
+import { useStore } from 'store';
 import Link from 'next/link';
 import ListItem from 'component/ListItem';
+import useTitle from 'hooks/useTitle';
+import { useRouter } from 'next/router';
 
 export async function getServerSideProps({ params }: any) {
   const userId = params?.id;
@@ -39,11 +42,17 @@ export async function getServerSideProps({ params }: any) {
 }
 
 const UserDetail = (props: any) => {
+  const router = useRouter();
+  const { id } = router.query;
   const { userInfo = {}, articles = [] } = props;
   const viewCount = articles?.reduce(
     (prev: any, next: any) => prev + next?.views,
     0
   );
+  const store = useStore();
+  const loginUserInfo = store.user.userInfo;
+
+  useTitle(`${userInfo?.nickname}的个人中心`);
 
   return (
     <div className={styles.userDetail}>
@@ -61,9 +70,11 @@ const UserDetail = (props: any) => {
               {userInfo?.introduce}
             </div>
           </div>
-          <Link href="/user/profile">
-            <Button>编辑个人资料</Button>
-          </Link>
+          {Number(loginUserInfo?.userId) === Number(id) && (
+            <Link href="/user/profile">
+              <Button>编辑个人资料</Button>
+            </Link>
+          )}
         </div>
         <Divider />
         <div className={styles.article}>

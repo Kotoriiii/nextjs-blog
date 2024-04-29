@@ -6,6 +6,7 @@ import styles from './index.module.scss';
 import * as ANTD_ICONS from '@ant-design/icons';
 import { useGetData, usePostData } from 'hooks/useRequest';
 import Loading from 'component/loading';
+import useTitle from 'hooks/useTitle';
 
 const { TabPane } = Tabs;
 
@@ -33,6 +34,8 @@ const Tag = () => {
   const store = useStore();
   const [needRefresh, setNeedRefresh] = useState(false);
   const { userId } = store?.user?.userInfo|| {};
+
+  useTitle('标签列表')
 
   const { trigger: followTag } = usePostData({
     url: '/api/tag/follow',

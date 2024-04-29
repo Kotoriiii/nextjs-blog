@@ -1,9 +1,9 @@
-import { useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import { Form, Input, Button, message } from 'antd';
 import styles from './index.module.scss';
 import { useRouter } from 'next/router';
 import { useGetData, usePostData } from 'hooks/useRequest';
+import Loading from 'component/loading';
 
 interface Info {
   id: number
@@ -28,11 +28,6 @@ const tailLayout = {
 const UserProfile = () => {
   const [form] = Form.useForm();
   const { push } = useRouter();
-  const [id, setId] = useState(0);
-
-  const { data } = useGetData<IUser>({ url: '/api/user/detail' });
-  form.setFieldsValue(data?.userInfo);
-  setId(Number(data?.userInfo?.id));
 
   const { trigger } =usePostData({
     url:'/api/user/update',
@@ -41,10 +36,15 @@ const UserProfile = () => {
     onSuccess(res){
       if (res?.code === 0) {
         message.success('修改成功');
-        push(`/user/${id}`);
+        push(`/user/${data?.userInfo.id}`);
       } 
     }
   })
+
+  const { data, isLoading } = useGetData<IUser>({ url: '/api/user/detail' });
+  if (isLoading) return <Loading/>;
+
+  form.setFieldsValue(data?.userInfo);
 
   const handleSubmit = (values: any) => {
     trigger({

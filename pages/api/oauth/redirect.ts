@@ -8,12 +8,6 @@ import { prepareConnenction } from 'db';
 import { UserAuth,User } from 'db/entity';
 import { setCookie } from 'util/index';
 
-// interface GitHubTokenResponse {
-//   access_token: string;
-//   token_type: string;
-//   scope: string;
-// }
-
 export default withIronSessionApiRoute(redirect, ironOptions);
 
 async function redirect(req: NextApiRequest, res: NextApiResponse) {

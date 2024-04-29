@@ -8,6 +8,7 @@ import { Itag } from './api';
 import classnames from 'classnames';
 import styles from './index.module.scss';
 import request from 'hooks/useRequest/AxiosInstance';
+import useTitle from 'hooks/useTitle';
 
 interface IProps {
   articles: IArticle[];
@@ -37,6 +38,8 @@ const Home = (props: IProps) => {
   const [selectTag, setSelectTag] = useState(0);
   const [showAricles, setShowAricles] = useState([...articles]);
   const [active, setActive] = useState('');
+
+  useTitle("Blog-C博客中心")
 
   const handleSelectTag = (e: any) => {
     const { tagid, active } = e?.target?.dataset || {};
