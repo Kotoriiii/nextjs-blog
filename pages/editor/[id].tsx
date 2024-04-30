@@ -11,6 +11,8 @@ import { prepareConnenction } from 'db';
 import { Article } from 'db/entity';
 import { IArticle } from 'pages/api';
 import useTitle from 'hooks/useTitle';
+import useAuth from 'hooks/useAuth';
+import React from 'react';
 
 const MDEditor = dynamic(() => import('@uiw/react-md-editor'), { ssr: false });
 
@@ -48,11 +50,20 @@ const ModifyEditor = ({article} : IProps) => {
   const [content, setContent] = useState(article?.content || '');
   const [allTags, setAllTags] = useState([]);
   const [tagIds, setTagIds] = useState((article?.tags?.map(tag => tag.id)) || []);
+  const { push, query } = useRouter();
+  const userId = article?.user?.id
+  const articleId = Number(query?.id);
 
   useTitle('编辑文章');
 
-  const { push, query } = useRouter();
-  const articleId = Number(query?.id);
+  const authCallback = React.useCallback((msg: string | null)=>{
+    if(msg){
+      message.error(msg);
+    }
+    push('/')
+  },[push])
+
+  const isAuth = useAuth(userId!, authCallback)
 
   useEffect(()=>{
     request.get('/api/tag/get').then((res:any) => {
@@ -97,32 +108,40 @@ const ModifyEditor = ({article} : IProps) => {
     setTagIds(value);
   }
 
-  return (
-    <div className={styles.container}>
-      <div className={styles.operation}>
-        <Input
-          className={styles.title}
-          placeholder="请输入文章标题"
-          value={title}
-          onChange={handleTitleChange}
-        ></Input>
-        <Select className={styles.tag} mode="multiple" allowClear placeholder="请选择标签" onChange={handleSelectTag} defaultValue={tagIds}>
-          {
-            allTags?.map((tag:any) => (
-              <Select.Option key={tag?.id} value={tag?.id}>{tag?.title}</Select.Option>
-            ))
-          }
-        </Select>
-        <Button
-          className={styles.button}
-          type="primary"
-          onClick={handlePublish}
-        >
-          发布
-        </Button>
+  const renderEditor = () => {
+    return (
+      <div className={styles.container}>
+        <div className={styles.operation}>
+          <Input
+            className={styles.title}
+            placeholder="请输入文章标题"
+            value={title}
+            onChange={handleTitleChange}
+          ></Input>
+          <Select className={styles.tag} mode="multiple" allowClear placeholder="请选择标签" onChange={handleSelectTag} defaultValue={tagIds}>
+            {
+              allTags?.map((tag:any) => (
+                <Select.Option key={tag?.id} value={tag?.id}>{tag?.title}</Select.Option>
+              ))
+            }
+          </Select>
+          <Button
+            className={styles.button}
+            type="primary"
+            onClick={handlePublish}
+          >
+            发布
+          </Button>
+        </div>
+        <MDEditor value={content} onChange={handleContentChange} />
       </div>
-      <MDEditor value={content} onChange={handleContentChange} />
-    </div>
+    )
+  };
+
+  return (
+    <>
+      {isAuth && renderEditor()}
+    </>
   );
 };
 

@@ -26,7 +26,7 @@ async function update(req: NextApiRequest, res: NextApiResponse) {
     user.job = job;
     user.introduce = introduce;
 
-    const resUser = userRepo.save(user);
+    const resUser = await userRepo.save(user);
 
     res?.status(200)?.json({
       code: 0,
