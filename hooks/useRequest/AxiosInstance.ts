@@ -23,7 +23,7 @@ requestInstance.interceptors.response.use(
   },
   (err: AxiosError) => {
     message.error((err.response?.data as ErrorResponse).msg || '未知错误')
-    Promise.reject(err);
+    throw err;
   }
 );
 
